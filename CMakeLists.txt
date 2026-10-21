@@ -107,6 +107,12 @@ target_link_libraries(planner_test_offline ${OpenCV_LIBS} fmt::fmt yaml-cpp auto
 add_executable(auto_aim_mpc_test tests/auto_aim_mpc_test.cpp)
 target_link_libraries(auto_aim_mpc_test ${OpenCV_LIBS} fmt::fmt yaml-cpp auto_aim tools io)
 
+
+# source vgd_msgs/install/setup.bash
+# cmake -B build
+# make -C build/ -j`nproc`
+
+
 # 检查 ROS 环境
 find_package(ament_cmake QUIET)
 find_package(rclcpp QUIET)
@@ -123,6 +129,7 @@ if(ament_cmake_FOUND AND rclcpp_FOUND AND std_msgs_FOUND AND rosidl_typesupport_
     add_executable(publish_test tests/publish_test.cpp)
     add_executable(subscribe_test tests/subscribe_test.cpp)
     add_executable(topic_loop_test tests/topic_loop_test.cpp)
+    add_executable(new_sentry src/sentry_new.cpp)
 
     target_link_libraries(sentry ${OpenCV_LIBS} fmt::fmt yaml-cpp auto_aim omniperception tools io)
     target_link_libraries(sentry_bp ${OpenCV_LIBS} fmt::fmt yaml-cpp auto_aim omniperception tools io)
@@ -131,6 +138,7 @@ if(ament_cmake_FOUND AND rclcpp_FOUND AND std_msgs_FOUND AND rosidl_typesupport_
     target_link_libraries(publish_test ${OpenCV_LIBS} fmt::fmt tools io auto_aim)
     target_link_libraries(subscribe_test ${OpenCV_LIBS} fmt::fmt tools io)
     target_link_libraries(topic_loop_test ${OpenCV_LIBS} fmt::fmt tools io)
+    target_link_libraries(new_sentry ${OpenCV_LIBS} fmt::fmt yaml-cpp auto_aim omniperception tools io)
 else()
     message(STATUS "ROS2 environment not found, skipping ROS2-related code.")
 endif()
