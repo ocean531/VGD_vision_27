@@ -93,11 +93,29 @@ int main(int argc, char * argv[])
 
     commandgener.push(targets, t, cboard.bullet_speed, ypr);  // 发送给决策线程
 
-    //ros2
+
+    /// ROS2通信（带 hold filter，避免 temp_lost 时偶尔一帧丢 0）
+    static int ros2_lost_count = 0;
+    static constexpr int ROS2_MAX_LOST_COUNT = 25;  // 与 tracker 的 max_temp_lost_count 一致
+    static Eigen::Vector4d last_valid_target_info = Eigen::Vector4d::Zero();
+
     Eigen::Vector4d target_info = decider.get_target_info(armors, targets);
 
+    if (target_info[2] > 0.5) {  // 当前帧有有效目标
+      ros2_lost_count = 0;
+      last_valid_target_info = target_info;
+    } else {  // 当前帧无目标
+      ros2_lost_count++;
+      if (ros2_lost_count <= ROS2_MAX_LOST_COUNT) {
+        // 短暂丢失期间保持上一次有效值，flag 仍为 1
+        target_info = last_valid_target_info;
+        target_info[2] = 1.0;
+      }
+      // 超过阈值后 target_info 保持为零，如实上报丢失
+    }
+
     ros2.publish(target_info);
-  }
+  
 
 
     /// debug
